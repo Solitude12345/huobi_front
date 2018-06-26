@@ -2,8 +2,10 @@ import Vue from 'vue'
 import store from '@/store'
 import * as pako from 'pako'
 import {promiseBreaker} from "./tools";
+import {createNamespacedHelpers} from 'vuex'
+const {mapState, mapGetters} = createNamespacedHelpers('pairs')
 
-const WS_URL = 'wss://api.huobi.pro/ws'
+const WS_URL = 'ws://192.168.10.132:15449'
 
 let wsBus = window.wsBus = new Vue({
   store,
@@ -11,17 +13,22 @@ let wsBus = window.wsBus = new Vue({
     ws: null,
     WS_URL: '',
     connectReady: promiseBreaker(), // 将是可外部决议的promise
-    hasSubMktOverview: false
   },
   computed: {
-    klineSymbol () { // 币币交易symbol
-      return this.$store.getters['pairs/klineSymbol']
-    }
+    ...mapState([
+      'quotationBaseCoin'
+    ]),
+    ...mapGetters([
+      'klineSymbol'
+    ])
   },
   watch: {
     klineSymbol (newSymbol, oldSymbol) {
       this.unsubscribe(oldSymbol)
       this.subscribe(newSymbol)
+    },
+    quotationBaseCoin (newCoin, oldCoin) {
+      this.subMktOverView(oldCoin)
     }
   },
   methods: {
@@ -32,7 +39,6 @@ let wsBus = window.wsBus = new Vue({
 
         this.connectReady.resolve()
         this.subscribe(this.klineSymbol);
-        // this.hasSubMktOverview && this.subMktOverView()
         this.subMktOverView()
       }
       ws.onmessage = (ev) => {
@@ -73,7 +79,7 @@ let wsBus = window.wsBus = new Vue({
       ws.onclose = () => {
         this.connectReady = promiseBreaker()
         console.log('ws close')
-        this.init()
+        // this.init()
       }
       ws.onerror = err => {
         console.log('ws error', err);
@@ -161,12 +167,13 @@ let wsBus = window.wsBus = new Vue({
       })
       return res
     },
-    async subMktOverView () {
+    async subMktOverView (unsubscirbeCoin) {
       await this.connectReady
       this.ws.send(JSON.stringify({
-        "sub": `market.overview`,
+        "topic": "snapshot",
+        "subscribe": [this.quotationBaseCoin],
+        "unsubscribe": [unsubscirbeCoin],
       }))
-      this.hasSubMktOverview = true
     }
   },
   created () {

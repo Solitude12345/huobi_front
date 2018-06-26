@@ -103,7 +103,7 @@ export default {
     }
   },
   computed: {
-    ...mapState([
+    ...mapState('user', [
       'balance'
     ])
   },

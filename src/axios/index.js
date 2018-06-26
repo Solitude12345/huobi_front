@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-import {Message, Notification} from 'element-ui'
+import {Notification} from 'element-ui'
 import store from '@/store'
 import router from '@/router'
 
@@ -14,7 +14,7 @@ axiosInstance.interceptors.response.use(
     : res,
   err => {
     console.log(err)
-    // Message.error('连接出错')
+    store.dispatch('showErrMsg', err.toString())
     return Promise.reject(err)
   }
 )
@@ -23,7 +23,7 @@ let {get: $get, post: $post} = axiosInstance
 
 let $tipPost = axiosInstance.$tipPost = async function (...args) {
   let res = await $post(...args)
-  !res._statusOk && Message.error('' + res.msg)
+  !res._statusOk && store.dispatch('showErrMsg', '' + res.msg)
   return res
 }
 
@@ -48,48 +48,44 @@ let inValidLogin = function () {
     })
     isErrorTipping = true
   }
-  !store.state.loginBack && store.commit('updateLoginBack', router.currentRoute.name)
-  store.dispatch('aLogout') // 强制注销用户信息
+  // !store.state.loginBack && store.commit('updateLoginBack', router.currentRoute.name)
+  store.dispatch('user/logout', false) // 强制注销用户信息
+  router.push('/Login')
 }
 
 let $fetch = axiosInstance.$fetch = async function $fetch (...args) {
   let res = await $post(...args)
   if (res._statusOk) return res
-  if (res.status !== 90005) {
-    // 非 无登录状态 引起的异常
-    Message.error('' + res.msg)
-    return res
-  } else {
+  if (res.status === 20006 || res.status === 90005) {
     // 需要登录状态但token无效
-    let {refresh_token} = store.state
+    let {refreshToken} = store.state.user
 
     // 已登录但token失效
-    if (refresh_token) {
-      // 如果有refresh_token尝试刷新token
+    if (refreshToken) {
+      // 如果有refreshToken尝试刷新token
       switch (isTokenUpdating) {
         // 并发请求防止多次触发refreshToken
         case updateStatus.ready:
-          reqTokenUpdate = $post('/api/refresh_token', {refresh_token})
-            .then(
-              resRefresh => {
-                if (resRefresh && resRefresh._statusOk) {
-                  // 刷新token成功 更新本地token，重发请求
-                  store.commit('mLogin', resRefresh.data)
-                  return $fetch(...args)
-                } else {
-                  // 刷新失败
-                  inValidLogin()
-                  return res
-                }
-              },
-              () => {
+          reqTokenUpdate = $post('/v1/user/accessToken', {refreshToken})
+            .then(resRefresh => {
+              if (resRefresh && resRefresh._statusOk) {
+                // 刷新token成功 更新本地token，重发请求
+                store.commit('user/updateRefreshToken', resRefresh.data.refresh_token)
+                // store.commit('user/mLogin', resRefresh.data)
+                return $fetch(...args)
+              } else {
+                // 刷新失败
                 inValidLogin()
                 return res
               }
-            ).finally(() => {
+            },
+            () => {
+              inValidLogin()
+              return res
+            })
+            .finally(() => {
               isTokenUpdating = updateStatus.ready
-            }
-            )
+            })
           isTokenUpdating = updateStatus.pending
           return reqTokenUpdate
         case updateStatus.pending:
@@ -110,10 +106,14 @@ let $fetch = axiosInstance.$fetch = async function $fetch (...args) {
         })
         isErrorTipping = true
       }
-      !store.state.loginBack && store.commit('updateLoginBack', router.currentRoute.name)
+      // !store.state.loginBack && store.commit('updateLoginBack', router.currentRoute.name)
       router.push('/Login')
       return res
     }
+  } else {
+    // 非 无登录状态 引起的异常
+    store.dispatch('showErrMsg', '' + res.msg)
+    return res
   }
 }
 

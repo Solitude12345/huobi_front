@@ -14,6 +14,8 @@ import '@/assets/js/filters'
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
+Vue.prototype.showErrMsg = msg => store.dispatch('showErrMsg', msg)
+Vue.prototype.log = console.log
 
 /* eslint-disable no-new */
 new Vue({

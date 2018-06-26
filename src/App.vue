@@ -5,6 +5,11 @@
       <router-view/>
     </div>
     <footer-comp></footer-comp>
+    <transition name="fade">
+      <div id="err-tip"
+           v-show="errMsg"
+           v-text="errMsg"></div>
+    </transition>
   </div>
 </template>
 
@@ -34,6 +39,9 @@ export default {
       return this.$route.name === 'Home'
         ? 'home-navbar'
         : ''
+    },
+    errMsg () {
+      return this.$store.state.errMsg
     }
   },
   methods: {
@@ -45,21 +53,34 @@ export default {
     // let res = await this.$get('https://api.huobipro.com/v1/common/symbols')
     // console.log(res)
     this.$store.dispatch('pairs/getAllSymbols')
-    this.$store.dispatch('getBalance')
+    this.$store.dispatch('user/getBalance')
+    this.$store.dispatch('user/getUserInfo')
   }
 }
 </script>
 
 <style>
-#app {
-}
-  #page-main{
-    /*margin-top: 56px;*/
-  }
   .home-navbar{
     position: absolute;
     z-index: 5;
     top: 0;
     background-color: rgba(0, 0, 0, .1) !important;
+  }
+  #err-tip{
+    min-width: 300px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.6);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    padding: 30px 20px;
+    color: #fff;
+    text-align: center;
+    font-size: 18px;
+    line-height: 30px;
+    z-index: 9999;
+    box-shadow: 0 0 5px #000;
   }
 </style>

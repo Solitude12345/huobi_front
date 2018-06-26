@@ -25,7 +25,6 @@ const emailValidator = function () {
   return {
     pattern: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
     message: '邮箱格式不正确',
-    trigger: 'blur'
   }
 }
 
@@ -72,6 +71,20 @@ const isSizeFit = function (fileRaw, mb) {
   return fileRaw.size <= mb * 1014 * 1024
 }
 
+const phoneNumberValidator = function () {
+  return {
+    pattern: /^\d{8,16}$/,
+    message: '手机号格式有误'
+  }
+}
+
+const confirmCodeValidator = function () {
+  return {
+    pattern: /^\d{4}$/,
+    message: '验证码为4位数字'
+  }
+}
+
 export {
   notEmpty,
   requireDigit,
@@ -84,4 +97,6 @@ export {
   supportCharOrDigiOrUnderline,
   isImg,
   isSizeFit,
+  phoneNumberValidator,
+  confirmCodeValidator,
 }

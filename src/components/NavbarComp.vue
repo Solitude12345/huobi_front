@@ -19,10 +19,14 @@
                        class="nav-item link">
             币币交易
           </router-link>
+        </ul>
+      </div>
+      <div class="fr">
+        <ul v-if="authorized">
           <router-link tag="li"
                        :to="{name: 'Finance'}"
                        class="nav-item link">
-            资产
+            个人资产
           </router-link>
           <li class="nav-item">
             <el-popover
@@ -31,7 +35,7 @@
               :visible-arrow="false"
               :offset="-20"
               popper-class="user-center-popper">
-              <span class="pointer" slot="reference">个人中心 <i class="el-icon-caret-bottom"></i></span>
+              <span class="pointer" slot="reference">{{nickname}} <i class="el-icon-caret-bottom"></i></span>
               <ul>
                 <router-link tag="li"
                              :to="{name: 'UserInfo'}"
@@ -39,14 +43,12 @@
                 <router-link tag="li"
                              :to="{name: 'UserAuth'}"
                              class="sub-nav-item">身份认证</router-link>
+                <li @click="logout" class="sub-nav-item">退出</li>
               </ul>
             </el-popover>
           </li>
-
         </ul>
-      </div>
-      <div class="fr">
-        <ul>
+        <ul v-if="!authorized">
           <router-link tag="li"
                        :to="{name: 'Login'}"
                        class="nav-item mr-0 link">登录</router-link>
@@ -60,8 +62,16 @@
 </template>
 
 <script>
+import {mapState, mapGetters, mapActions} from 'vuex'
 export default {
-  name: "navbar-comp"
+  name: "navbar-comp",
+  computed: {
+    ...mapState('user', ['nickname']),
+    ...mapGetters('user', ['authorized'])
+  },
+  methods: {
+    ...mapActions('user', ['logout'])
+  }
 }
 </script>
 

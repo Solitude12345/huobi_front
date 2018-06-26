@@ -3,35 +3,36 @@ import Vuex from 'vuex'
 
 // import modules start
 import pairs from './modules/pairs'
-import {$get} from "../axios";
+import user from './modules/user'
 // import models end
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   modules: {
+    user,
     pairs
   },
   state: {
-    balance: {}
+    errMsg: '',
+    errMsgTimeout: null
   },
   mutations: {
-    updateGetBalance (state, list) {
-      state.balance = list
+    updateErrMsg (state, msg) {
+      state.errMsg = msg
+    },
+    updateErrMsgTimeout (state, timeoutId) {
+      clearTimeout(state.errMsgTimeout)
+      state.errMsgTimeout = timeoutId
     }
   },
   actions: {
-    async getBalance ({commit}) {
-      let res = await $get('/static/balance.json')
-      console.log(res)
-      let result = {}
-      res.data.list.forEach(({currency, type, balance}) => {
-        result[currency]
-          ? result[currency][type] === undefined && (result[currency][type] = balance)
-          : result[currency] = {[type]: balance}
-      })
-      console.log(result)
-      res.status === 'ok' && commit('updateGetBalance', result)
+    showErrMsg ({commit}, msg) {
+      commit('updateErrMsg', msg)
+      let timeoutId = setTimeout(() => {
+        commit('updateErrMsg', '')
+      }, 4000)
+      commit('updateErrMsgTimeout', timeoutId)
     }
   }
 })

@@ -1,6 +1,7 @@
 <template>
   <div class="comp-coin-list">
-      <el-tabs v-model="activeBaseCoin" type="card">
+      <!--<el-tabs v-model="quotationBaseCoin" type="card">-->
+      <el-tabs :value="quotationBaseCoin" @tab-click="({name}) => updateQuotationBaseCoin(name)" type="card">
         <el-tab-pane v-for="(obj, baseCoin) in allPairSymbols || initSymbols"
                      :name="baseCoin"
                      :key="baseCoin">
@@ -84,13 +85,13 @@ export default {
   components: {ObviousPriceComp},
   data () {
     return {
-      favoritePairs: [],
-      activeBaseCoin: 'USDT'
+      favoritePairs: []
     }
   },
   computed: {
     ...mapState([
-      'allPairSymbols'
+      'allPairSymbols',
+      'quotationBaseCoin'
     ])
   },
   filters: {
@@ -117,7 +118,8 @@ export default {
       })
     },
     ...mapMutations([
-      'updateKlineSymbol'
+      'updateKlineSymbol',
+      'updateQuotationBaseCoin'
     ])
   }
 }

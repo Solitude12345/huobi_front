@@ -3,6 +3,7 @@ import {$get} from '@/axios'
 export default {
   namespaced: true,
   state: {
+    quotationBaseCoin: localStorage.getItem('quotationBaseCoin') || 'USDT',
     baseCoin: 'USDT',
     targetCoin: 'BTC',
     allPairSymbols: JSON.parse(localStorage.getItem('allPairSymbols')) || {},
@@ -11,18 +12,6 @@ export default {
   getters: {
     klineSymbol (state) {
       return (state.targetCoin + state.baseCoin).toLowerCase()
-    },
-    allBaseCoins (state) {
-      let obj = {}
-      let result = []
-      state.allPairSymbols.forEach(pair => {
-        let baseCoin = pair['quote-currency']
-        if (!obj[baseCoin]) {
-          obj[baseCoin] = true
-          result.push(baseCoin)
-        }
-      })
-      return result
     }
   },
   mutations: {
@@ -51,6 +40,10 @@ export default {
           }
         })
       })
+    },
+    updateQuotationBaseCoin (state, coin) {
+      state.quotationBaseCoin = coin
+      localStorage.setItem('quotationBaseCoin', coin)
     }
   },
   actions: {
@@ -64,17 +57,16 @@ export default {
       if (res.status === 'ok') {
         let obj = {}
         res.data.forEach(pair => {
-          obj[pair['quote-currency'].toUpperCase()] = {
-            [pair['base-currency'].toUpperCase()]: {
-              amount: null,
-              close: null,
-              count: null,
-              high: null,
-              low: null,
-              open: null,
-              symbol: null,
-              vol: null,
-            }
+          let baseCoinObj = obj[pair['quote-currency'].toUpperCase()] || (obj[pair['quote-currency'].toUpperCase()] = {})
+          baseCoinObj[pair['base-currency'].toUpperCase()] = {
+            amount: null,
+            close: null,
+            count: null,
+            high: null,
+            low: null,
+            open: null,
+            symbol: null,
+            vol: null,
           }
         })
         commit('updateGetAllSymbols', obj)

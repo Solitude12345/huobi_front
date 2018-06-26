@@ -19,6 +19,15 @@ module.exports = {
           '^/huobipro': ''
         }
       },
+      '/v1': {
+        target: 'http://192.168.10.198:8000',
+        changeOrigin: true,
+        // secure: false, // https需要
+        pathRewrite: {
+          '^/v1': 'v1'
+        }
+      },
+
     },
 
     // Various Dev Server settings
@@ -48,7 +57,7 @@ module.exports = {
     // set this to false - it *may* help
     // https://vue-loader.vuejs.org/en/options.html#cachebusting
     cacheBusting: true,
-
+    devtool: '#source-map',
     cssSourceMap: false
   },
 
