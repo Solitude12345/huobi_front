@@ -5,10 +5,17 @@ import Register from '@p/Register'
 import Login from '@p/Login'
 import Pairs from '@p/Pairs'
 import Trade from '@p/Trade'
-import Finance from '@p/Finance'
+
+import Finance from '@p/Finance/Index'
+import CtcWallet from '@p/Finance/CtcWallet'
+import OtcWallet from '@p/Finance/OtcWallet'
+
 import UserCenter from '@p/UserCenter/Index'
 import UserInfo from '@p/UserCenter/UserInfo'
 import UserAuth from '@p/UserCenter/UserAuth'
+import ModifyPassword from '@p/UserCenter/ModifyPassword'
+import BindMobile from '@p/UserCenter/BindMobile'
+import BindEmail from '@p/UserCenter/BindEmail'
 
 Vue.use(Router)
 
@@ -41,8 +48,23 @@ export default new Router({
     },
     {
       path: '/Finance',
-      name: 'Finance',
-      component: Finance
+      component: Finance,
+      children: [
+        {
+          path: '',
+          redirect: 'CtcWallet'
+        },
+        {
+          path: 'CtcWallet',
+          name: 'CtcWallet',
+          component: CtcWallet
+        },
+        {
+          path: 'OtcWallet',
+          name: 'OtcWallet',
+          component: OtcWallet
+        },
+      ]
     },
     {
       path: '/UserCenter',
@@ -57,6 +79,21 @@ export default new Router({
           path: 'UserAuth',
           name: 'UserAuth',
           component: UserAuth
+        },
+        {
+          path: 'ModifyPassword',
+          name: 'ModifyPassword',
+          component: ModifyPassword
+        },
+        {
+          path: 'BindMobile',
+          name: 'BindMobile',
+          component: BindMobile
+        },
+        {
+          path: 'BindEmail',
+          name: 'BindEmail',
+          component: BindEmail
         },
 
       ]

@@ -20,7 +20,8 @@
               <el-form-item label="国籍"
                             prop="countryId">
                 <div>
-                  <el-select v-model="formData.countryId" class="w100">
+                  <el-select v-model="formData.countryId"
+                             class="w100">
                     <el-option v-for="areaCode in areaCodes"
                                :key="areaCode.country_id"
                                :label="areaCode.name_en"
@@ -36,7 +37,7 @@
                             label="手机号码">
                 <el-input v-model.trim="formData.phoneNumber">
                   <template slot="prepend">
-                    <el-select v-model="formData.areaCode">
+                    <el-select v-model="formData.areaCode" placeholder="地区号">
                       <el-option v-for="areaCode in areaCodes"
                                  :key="areaCode.country_id"
                                  :value="areaCode.area_code">
@@ -53,21 +54,21 @@
                 <el-input v-model.trim="formData.email"></el-input>
               </el-form-item>
               <el-form-item :label="registerType === 'phone'?'短信验证码':'邮件验证码'"
-                            prop="vetifyCode">
+                            prop="verifyCode">
                 <div>
                   <br>
                   <el-input
-                    v-model="formData.vetifyCode"
+                    v-model="formData.verifyCode"
                     placeholder="30分钟内输入有效"
-                    class="w60"></el-input>
-                  <el-button
-                    type="text"
-                    class="ml-20"
-                    v-if="!(readingTime>0)"
-                    :loading="loading.sendingVerify"
-                    @click="sendVerification">发送验证码
-                  </el-button>
-                  <span v-else style="margin-left: 20px;">{{`${readingTime}s后重新获取`}}</span>
+                    class="w65"></el-input>
+                  <send-verify-code-comp type="register"
+                                         class="ml-20"
+                                         ref="verify"
+                                         @click="sendVerify"
+                                         :mobile="formData.phoneNumber"
+                                         :email="formData.email"
+                                         :disabled="disableSendVerifyCode"
+                                         :areaCode="formData.areaCode" />
                 </div>
               </el-form-item>
               <el-form-item label="登录密码" prop="password">
@@ -119,21 +120,25 @@ import {
   requireCharacter,
   checkPasswordValidator,
   confirmCodeValidator,
+  maxLength,
+  requireDigit,
 } from "../assets/js/validators";
+import SendVerifyCodeComp from '@c/SendVerifyCodeComp'
 
 export default {
   name: "register",
+  components: {
+    SendVerifyCodeComp
+  },
   data () {
     return {
       registerType: 'phone',
-      readingTime: 0,
-      ticker: null,
       formData: {
         countryId: '',
-        areaCode: '0086',
+        areaCode: '',
         phoneNumber: '',
         email: '',
-        vetifyCode: '',
+        verifyCode: '',
         password: '',
         checkPassword: '',
         inviteCode: '',
@@ -142,7 +147,6 @@ export default {
       areaCodes: [],
       loading: {
         register: false,
-        sendingVerify: false
       }
     }
   },
@@ -163,20 +167,30 @@ export default {
           notEmpty('手机号'),
           phoneNumberValidator(),
         ],
-        vetifyCode: [
+        verifyCode: [
           notEmpty('验证码'),
           confirmCodeValidator()
         ],
         password: [
           notEmpty('账户密码'),
           minLength(8),
-          requireCharacter()
+          maxLength(20),
+          requireCharacter(),
+          requireDigit()
         ],
         checkPassword: [
           checkPasswordValidator(this.formData.password)
         ],
         inviteCode: [],
         agree: []
+      }
+    },
+    disableSendVerifyCode () {
+      switch (this.registerType) {
+        case 'phone':
+          return !this.formData.areaCode || !phoneNumberValidator().pattern.test(this.formData.phoneNumber)
+        case 'email':
+          return !emailValidator().pattern.test(this.formData.email)
       }
     }
   },
@@ -186,7 +200,8 @@ export default {
     },
     registerType () {
       this.$refs.form.resetFields()
-      this.readingTime = 0
+      this.formData.areaCode = ''
+      this.$refs.verify.init()
     },
     'formData.countryId' (cId) {
       if (cId) this.formData.areaCode = this.areaCodes.find(item => item.country_id === cId).area_code
@@ -198,6 +213,9 @@ export default {
       if (!valid) return
       this.loading.submit = true
       let res = await this.$tipPost('/v1/user/register', this.formData)
+        .finally(() => {
+          this.loading.submit = false
+        })
       if (res._statusOk) {
         this.$alert('注册成功，将为您跳转到登录页面。')
           .finally(() => {
@@ -205,58 +223,13 @@ export default {
           })
       }
     },
-    sendVerification () {
-      let field = this.registerType === 'phone'
-        ? 'phoneNumber'
-        : 'email'
-      this.$refs.form.validateField(field, async err => {
-        if (err) return
-        this.loading.sendingVerify = true
-        let url, payload
-        switch (this.registerType) {
-          case 'phone':
-            url = '/v1/sendsms/register'
-            payload = {
-              mobile: this.formData.phoneNumber,
-              areaCode: this.formData.areaCode
-            }
-            break
-          case 'email':
-            url = '/v1/sendmail'
-            payload = {
-              email: this.formData.email,
-              emailType: 'register',
-            }
-            break
-        }
-        let res = await this.$tipPost(url, payload)
-          .finally(() => {
-            this.loading.sendingVerify = false
-          })
-        if (res._statusOk) {
-          this.showErrMsg('验证码已发送，请注意查收')
-          // 读秒2分钟重新获取验证码
-          this.readingTime = 120
-          this.ticker = setInterval(() => {
-            if (--this.readingTime <= 0) {
-              clearInterval(this.ticker)
-            }
-          }, 1000)
-        }
-      })
-    }
+    sendVerify () {
+      this.$refs.verify.send()
+    },
   },
   async created () {
     let res = await this.$get('/static/areaCode.json')
     this.areaCodes = res.data
-    /*
-    * resCode ==> {
-    * "area_code":"00355",
-    * "country_id":3,
-    * "name_cn":"阿尔巴尼亚",
-    * "name_en":"Albania"
-    * }
-    * */
   }
 }
 </script>
@@ -268,10 +241,5 @@ export default {
   }
   .tip-text{
     margin-top: 160px;
-  }
-</style>
-<style>
-  #page-register .el-form-item.is-required .el-form-item__label:before{
-    display: none;
   }
 </style>

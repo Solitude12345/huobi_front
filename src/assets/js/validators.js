@@ -17,7 +17,6 @@ const notEmpty = function (label) {
   return {
     required: true,
     message: `* ${label}必填`,
-    trigger: 'blur'
   }
 }
 

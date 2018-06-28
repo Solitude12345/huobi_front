@@ -26,6 +26,7 @@
   color: #61688a;
 }
 .el-input__inner,
+.el-form-item.is-success .el-input__inner,
 .el-input-group__append,
 .el-input-group__prepend
 {
@@ -64,7 +65,8 @@
   background-color: #262a42;
 }
 .el-select-dropdown__item.selected,
-.el-select-dropdown__item:hover
+.el-select-dropdown__item:hover,
+.el-message-box__content
 {
   color: #c7cce6;
 }
@@ -97,4 +99,16 @@
 }
 .el-slider__button{
   background-color: #4e5b85;
+}
+
+.el-form-item.is-required .el-form-item__label:before{
+  display: none;
+}
+
+.el-message-box {
+  background-color: #262a42;
+  border: none;
+}
+.el-message-box__title{
+  color: #e5e5e5;
 }

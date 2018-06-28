@@ -71,19 +71,22 @@ export default {
         let {nickname, refresh_token} = res.data
         this.updateRefreshToken(refresh_token)
         this.updateNickname(nickname)
-        // this.$router.push({name: 'Pairs'})
-        this.$router.go(-1)
+        this.$getUserInfo()
+        this.$router.push({
+          name: localStorage.getItem('loginBack') || 'Pairs'
+        })
+        localStorage.removeItem('loginBack')
       } else if (res.status === 10002) {
         // 密码错误
-        this.showErrMsg(`密码有误，您还有 ${res.data.surplus_count} 次重试机会`)
+        this.$showErrMsg(`密码有误，您还有 ${res.data.surplus_count} 次重试机会`)
       } else if (res.status === 10003) {
         // 已冻结
         let {limitTime} = res.data
         let hours = Math.floor(limitTime / 60 / 60)
         let minutes = Math.ceil((limitTime % (60 * 60)) / 60)
-        this.showErrMsg(`账号已被冻结，请 ${hours ? `${hours} 小时 ` : ''}${minutes} 分钟后再试`)
+        this.$showErrMsg(`账号已被冻结，请 ${hours ? `${hours} 小时 ` : ''}${minutes} 分钟后再试`)
       } else {
-        this.showErrMsg(res.msg)
+        this.$showErrMsg(res.msg)
       }
     },
     ...mapMutations('user', [

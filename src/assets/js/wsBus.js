@@ -32,7 +32,7 @@ let wsBus = window.wsBus = new Vue({
     }
   },
   methods: {
-    init () {
+    init (subscribeCoin = this.quotationBaseCoin) {
       let ws = this.ws = new WebSocket(WS_URL);
       ws.onopen = () => {
         console.log('ws open');
@@ -167,16 +167,17 @@ let wsBus = window.wsBus = new Vue({
       })
       return res
     },
-    async subMktOverView (unsubscirbeCoin) {
+    async subMktOverView (subscribeCoin = this.quotationBaseCoin, unsubscirbeCoin) {
       await this.connectReady
       this.ws.send(JSON.stringify({
         "topic": "snapshot",
-        "subscribe": [this.quotationBaseCoin],
+        "subscribe": [subscribeCoin],
         "unsubscribe": [unsubscirbeCoin],
       }))
     }
   },
   created () {
+    window.wsBus = this
     console.log('wsBus created!')
     this.init()
   }

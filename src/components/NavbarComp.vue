@@ -24,10 +24,8 @@
       <div class="fr">
         <ul v-if="authorized">
           <router-link tag="li"
-                       :to="{name: 'Finance'}"
-                       class="nav-item link">
-            个人资产
-          </router-link>
+                       to="/Finance"
+                       class="nav-item link">个人资产</router-link>
           <li class="nav-item">
             <el-popover
               trigger="hover"

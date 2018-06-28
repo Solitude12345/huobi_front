@@ -7,6 +7,8 @@
     <footer-comp></footer-comp>
     <transition name="fade">
       <div id="err-tip"
+           @mouseenter="errMsgMouseIn"
+           @mouseout="errMsgMouseOut"
            v-show="errMsg"
            v-text="errMsg"></div>
     </transition>
@@ -42,11 +44,23 @@ export default {
     },
     errMsg () {
       return this.$store.state.errMsg
+    },
+    authorized () {
+      return this.$store.state.user.authorized
     }
   },
   methods: {
+    errMsgMouseIn () {
+      this.$store.commit('updateErrMsgTimeout', null, true)
+    },
+    errMsgMouseOut () {
+      this.$store.commit('updateErrMsgTimeout', setTimeout(() => {
+        this.$store.commit('updateErrMsg', '')
+      }, 3000))
+    }
   },
   async created () {
+    window.app = this
     // if (!window.WebSocket) {
     //   alert('浏览器不支持websocket!')
     // }
@@ -54,7 +68,7 @@ export default {
     // console.log(res)
     this.$store.dispatch('pairs/getAllSymbols')
     this.$store.dispatch('user/getBalance')
-    this.$store.dispatch('user/getUserInfo')
+    this.authorized && this.$getUserInfo()
   }
 }
 </script>

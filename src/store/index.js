@@ -21,8 +21,8 @@ const store = new Vuex.Store({
     updateErrMsg (state, msg) {
       state.errMsg = msg
     },
-    updateErrMsgTimeout (state, timeoutId) {
-      clearTimeout(state.errMsgTimeout)
+    updateErrMsgTimeout (state, timeoutId, isFocus) {
+      !isFocus && clearTimeout(state.errMsgTimeout)
       state.errMsgTimeout = timeoutId
     }
   },

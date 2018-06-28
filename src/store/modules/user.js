@@ -3,10 +3,13 @@ import {$get, $fetch} from '@/axios'
 export default {
   namespaced: true,
   state: {
+    uid: null,
     authorized: false,
     refreshToken: localStorage.getItem('refreshToken'),
     nickname: localStorage.getItem('nickname'),
     balance: {},
+    email: null,
+    mobile: null,
   },
   getters: {
     authorized (state) {
@@ -28,6 +31,9 @@ export default {
       nickname
         ? localStorage.setItem('nickname', nickname)
         : localStorage.removeItem('nickname')
+    },
+    updateUserInfo (state, data) {
+      Object.assign(state, data)
     }
   },
   actions: {
@@ -53,7 +59,7 @@ export default {
     },
     async getUserInfo ({commit}) {
       let res = await $fetch('/v1/user/userinfo')
-      console.log(res)
+      res._statusOk && commit('updateUserInfo', res.data)
     }
   }
 }

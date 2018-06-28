@@ -14,7 +14,8 @@ import '@/assets/js/filters'
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
-Vue.prototype.showErrMsg = msg => store.dispatch('showErrMsg', msg)
+Vue.prototype.$showErrMsg = msg => store.dispatch('showErrMsg', msg)
+Vue.prototype.$getUserInfo = () => store.dispatch('user/getUserInfo')
 Vue.prototype.log = console.log
 
 /* eslint-disable no-new */

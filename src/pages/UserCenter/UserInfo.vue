@@ -4,46 +4,122 @@
       <div class="cont-title">基本信息</div>
       <div>
         <div class="item">
-          <div class="item-label">账号：</div>
-          <div class="item-info">150****6904</div>
+          <div class="item-label">账号</div>
+          <div class="item-info">{{mobile || email}}</div>
         </div>
         <div class="item">
-          <div class="item-label">UID：</div>
-          <div class="item-info">15884239</div>
+          <div class="item-label">UID</div>
+          <div class="item-info">{{uid}}</div>
         </div>
         <div class="item">
-          <div class="item-label">登录密码：</div>
+          <div class="item-label">昵称</div>
+          <div class="item-info">{{nickname}}</div>
+          <div class="item-right">
+            <a @click="modifyNickname">修改</a>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-label">登录密码</div>
           <div class="item-info">********</div>
-          <div class="item-right"></div>
+          <div class="item-right">
+            <router-link :to="{name: 'ModifyPassword'}">修改</router-link>
+          </div>
         </div>
-
+        <div class="item">
+          <div class="item-label">资金密码</div>
+          <div class="item-info">********</div>
+          <div class="item-right">
+            <router-link :to="{name: 'ModifyTradePassword'}">重置</router-link>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cont-box">
+      <div class="cont-title">
+        收付款方式
+        <a class="font-14 ph-10 fr">添加收付方式</a>
+      </div>
+      <div>
+        <div class="item">
+          <div class="item-label">
+            <img src="/static/img/icon/bankcard.png" class="mr-5" alt="">
+            银行卡
+          </div>
+          <div class="item-info">asdfasdf</div>
+          <div class="item-right">
+            <el-switch :value="true" class="mr-10"></el-switch>
+            <a>修改</a>
+            <a>删除</a>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-label">
+            <img src="/static/img/icon/alipay.png" class="mr-5" alt="">
+            支付宝
+          </div>
+          <div class="item-info">asdfasdf</div>
+          <div class="item-right">
+            <el-switch :value="true" class="mr-10"></el-switch>
+            <a>修改</a>
+            <a>删除</a>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-label">
+            <img src="/static/img/icon/wechat.png" class="mr-5" alt="">
+            微信
+          </div>
+          <div class="item-info">asdfasdf</div>
+          <div class="item-right">
+            <el-switch :value="true" class="mr-10"></el-switch>
+            <a>修改</a>
+            <a>删除</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="cont-box">
       <div class="cont-title">双重身份认证</div>
       <div>
         <div class="item">
-          <div class="item-label">安全等级：</div>
+          <div class="item-label">安全等级</div>
           <div class="item-info">
             <div class="bar-bg">
-              <div class="bar-percent"></div>
-            </div> 中
+              <div class="bar-percent" :class="fullSafety?'w90':'w50'"></div>
+            </div>
+            <span class="ml-15">{{fullSafety ? '高' : '中'}}</span>
           </div>
-          <div class="item-tip">建议绑定手机</div>
+          <div class="item-tip">
+            <span v-if="!mobile">建议绑定手机</span>
+            <span v-if="!email">建议绑定邮箱</span>
+          </div>
         </div>
         <div class="item">
-          <div class="item-label"><i class="el-icon-success color-success mr-5"></i>邮箱</div>
-          <div class="item-info">371****@qq.com</div>
-          <div class="item-tip">用于提币、找回密码、修改安全设置、管理API时进行安全验证。</div>
-          <div class="item-right"><a>关闭验证</a></div>
-        </div>
-        <div class="item">
-          <div class="item-label"><i class="el-icon-warning color-danger mr-5"></i>手机</div>
-          <div class="item-info">150****6904</div>
+          <div class="item-label">
+            <i class="mr-5"
+               :class="!!email ? 'el-icon-success color-success' : 'el-icon-warning color-danger'"></i>
+            邮箱
+          </div>
+          <div class="item-info">{{email || '未绑定'}}</div>
           <div class="item-tip">用于提币、找回密码、修改安全设置、管理API时进行安全验证。</div>
           <div class="item-right">
-            <a>修改</a>
-            <a>关闭验证</a>
+            <router-link :to="{name: 'BindEmail'}">
+              {{!!email ? '修改' : '绑定'}}
+            </router-link>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-label">
+            <i class="mr-5"
+               :class="!!mobile ? 'el-icon-success color-success' : 'el-icon-warning color-danger'"></i>
+            手机
+          </div>
+          <div class="item-info">{{mobile || '未绑定'}}</div>
+          <div class="item-tip">用于提币、找回密码、修改安全设置、管理API时进行安全验证。</div>
+          <div class="item-right">
+            <router-link :to="{name: 'BindMobile'}">
+              {{!!mobile ? '修改' : '绑定'}}
+            </router-link>
           </div>
         </div>
 
@@ -83,15 +159,47 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
 export default {
   name: "user-info",
   data () {
     return {}
   },
-  computed: {},
+  computed: {
+    fullSafety () {
+      return !!this.email && !!this.mobile
+    },
+    ...mapState('user', [
+      'mobile',
+      'email',
+      'uid',
+      'nickname'
+    ])
+  },
   watch: {},
-  methods: {},
+  methods: {
+    async modifyNickname () {
+      let {value} = await this.$prompt('请输入新昵称', {
+        showCancelButton: false,
+        closeOnClickModal: false,
+        inputPattern: /^.{1,20}$/,
+        inputErrorMessage: '昵称长度限制1~20位'
+      })
+      if (value.trim()) {
+        let res = await this.$fetch('/v1/user/modify', {
+          nickname: value.trim()
+        })
+        if (res._statusOk) {
+          this.$showErrMsg('昵称修改成功')
+          this.$getUserInfo()
+        }
+      } else {
+        this.$showErrMsg('未输入新昵称，请重试')
+      }
+    }
+  },
   created () {
+    this.$getUserInfo()
   }
 }
 </script>
@@ -134,7 +242,6 @@ export default {
   }
   .bar-percent{
     height: 12px;
-    width: 50%;
     background-color: #7a98f7;
   }
 </style>

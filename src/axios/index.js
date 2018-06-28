@@ -50,7 +50,9 @@ let inValidLogin = function () {
   }
   // !store.state.loginBack && store.commit('updateLoginBack', router.currentRoute.name)
   store.dispatch('user/logout', false) // 强制注销用户信息
-  router.push('/Login')
+  // router.push('/Login')
+  localStorage.setItem('loginBack', router.currentRoute.name)
+  location.href = '/#/Login'
 }
 
 let $fetch = axiosInstance.$fetch = async function $fetch (...args) {
