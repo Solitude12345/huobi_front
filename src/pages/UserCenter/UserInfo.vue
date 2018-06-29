@@ -20,16 +20,23 @@
         </div>
         <div class="item">
           <div class="item-label">登录密码</div>
-          <div class="item-info">********</div>
+          <div class="item-info">**********</div>
           <div class="item-right">
             <router-link :to="{name: 'ModifyPassword'}">修改</router-link>
           </div>
         </div>
         <div class="item">
-          <div class="item-label">资金密码</div>
-          <div class="item-info">********</div>
+          <div class="item-label">
+            <i
+              v-if="!hasTradePassword"
+              class="el-icon-warning color-danger mr-5"></i>
+            资金密码
+          </div>
+          <div class="item-info">{{hasTradePassword ? '******' : '未设置'}}</div>
           <div class="item-right">
-            <router-link :to="{name: 'ModifyTradePassword'}">重置</router-link>
+            <router-link :to="{name: 'SetTradePassword'}">
+              {{hasTradePassword ? '重置' : '设置'}}
+            </router-link>
           </div>
         </div>
       </div>
@@ -173,7 +180,8 @@ export default {
       'mobile',
       'email',
       'uid',
-      'nickname'
+      'nickname',
+      'hasTradePassword'
     ])
   },
   watch: {},

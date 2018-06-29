@@ -4,12 +4,12 @@ export default {
   namespaced: true,
   state: {
     uid: null,
-    authorized: false,
     refreshToken: localStorage.getItem('refreshToken'),
     nickname: localStorage.getItem('nickname'),
     balance: {},
     email: null,
     mobile: null,
+    hasTradePassword: false
   },
   getters: {
     authorized (state) {

@@ -18,7 +18,7 @@
                            :disabled="!formData.username || !formData.password"
                            :loading="loading.login"
                            class="w35 mr-20">登录</el-button>
-                <el-button type="text">忘记密码？</el-button>
+                <router-link class="ml-15" :to="{name: 'ForgetPassword'}">忘记密码 ？</router-link>
               </el-form-item>
 
             </el-form>

@@ -1,5 +1,5 @@
 <template>
-  <div class="display-ib">
+  <div class="comp-send-verify">
     <el-button
       @click="$emit('click')"
       type="text"
@@ -7,7 +7,7 @@
       :loading="loading"
       :disabled="disabled">发送验证码
     </el-button>
-    <span v-else>{{`${readingTime}s后重新获取`}}</span>
+    <span v-else>{{`${readingTime}s 后重新获取`}}</span>
   </div>
 </template>
 
@@ -51,22 +51,51 @@ export default {
     },
     send () {
       if (!this.disabled) {
+        let req
         switch (this.type) {
           case 'register':
             if (this.mobile) {
-              let req = this.$tipPost('/v1/sendsms/register', {
+              req = this.$tipPost('/v1/sendsms/register', {
                 mobile: this.mobile,
                 areaCode: this.areaCode
               })
-              this.wrapRequest(req)
             } else if (this.email) {
-              let req = this.$tipPost('/v1/sendmail', {
+              req = this.$tipPost('/v1/sendmail', {
                 email: this.email,
                 emailType: 'register',
               })
-              this.wrapRequest(req)
             }
+            break
+          case 'bindMobile':
+            req = this.$fetch('/v1/sendsms/bindMobile', {
+              areaCode: this.areaCode,
+              mobile: this.mobile
+            })
+            break
+          case 'bindEmail':
+            req = this.$fetch('/v1/sendmail', {
+              emailType: 'bindEmail',
+              email: this.email
+            })
+            break
+          case 'setTradePassword':
+            req = this.$fetch('/v1/sendsms/setTradePassword')
+            break
+          case 'forgetPassword':
+            if (this.mobile) {
+              req = this.$tipPost('/v1/sendsms/forgetPassword', {
+                mobile: this.mobile,
+                areaCode: this.areaCode
+              })
+            } else {
+              req = this.$tipPost('/v1/sendmail', {
+                email: this.email,
+                emailType: 'forgetPassword'
+              })
+            }
+            break
         }
+        req && this.wrapRequest(req)
       }
     },
     init () {
@@ -82,5 +111,10 @@ export default {
 </script>
 
 <style scoped>
-
+  .comp-send-verify{
+    display: inline-block;
+  }
+  .el-button--text.is-disabled{
+    color: #61688a;
+  }
 </style>

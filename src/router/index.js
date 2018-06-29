@@ -5,6 +5,7 @@ import Register from '@p/Register'
 import Login from '@p/Login'
 import Pairs from '@p/Pairs'
 import Trade from '@p/Trade'
+import ForgetPassword from '@p/ForgetPassword'
 
 import Finance from '@p/Finance/Index'
 import CtcWallet from '@p/Finance/CtcWallet'
@@ -16,6 +17,7 @@ import UserAuth from '@p/UserCenter/UserAuth'
 import ModifyPassword from '@p/UserCenter/ModifyPassword'
 import BindMobile from '@p/UserCenter/BindMobile'
 import BindEmail from '@p/UserCenter/BindEmail'
+import SetTradePassword from '@p/UserCenter/SetTradePassword'
 
 Vue.use(Router)
 
@@ -45,6 +47,11 @@ export default new Router({
       path: '/Trade',
       name: 'Trade',
       component: Trade
+    },
+    {
+      path: '/ForgetPassword',
+      name: 'ForgetPassword',
+      component: ForgetPassword
     },
     {
       path: '/Finance',
@@ -94,6 +101,11 @@ export default new Router({
           path: 'BindEmail',
           name: 'BindEmail',
           component: BindEmail
+        },
+        {
+          path: 'SetTradePassword',
+          name: 'SetTradePassword',
+          component: SetTradePassword
         },
 
       ]

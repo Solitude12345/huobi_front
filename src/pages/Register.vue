@@ -6,8 +6,8 @@
           <h1 class="fw-nm">欢迎注册</h1>
           <div class="mv-30">
             <span class="link"
-                  @click="registerType='phone'"
-                  :class="{'is-active': registerType==='phone'}">手机注册</span>
+                  @click="registerType='mobile'"
+                  :class="{'is-active': registerType==='mobile'}">手机注册</span>
             <span class="link"
                   @click="registerType='email'"
                   :class="{'is-active': registerType==='email'}">邮箱注册</span>
@@ -32,7 +32,7 @@
                   </el-select>
                 </div>
               </el-form-item>
-              <el-form-item key="phone" v-if="registerType==='phone'"
+              <el-form-item key="mobile" v-if="registerType==='mobile'"
                             prop="phoneNumber"
                             label="手机号码">
                 <el-input v-model.trim="formData.phoneNumber">
@@ -53,7 +53,7 @@
                             label="邮箱">
                 <el-input v-model.trim="formData.email"></el-input>
               </el-form-item>
-              <el-form-item :label="registerType === 'phone'?'短信验证码':'邮件验证码'"
+              <el-form-item :label="registerType === 'mobile'?'短信验证码':'邮件验证码'"
                             prop="verifyCode">
                 <div>
                   <br>
@@ -89,6 +89,7 @@
               <el-form-item class="mt-25">
                 <el-button type="primary"
                            @click="submit"
+                           :loading="loading.submit"
                            :disabled="!formData.agree"
                            class="w35">注册</el-button>
               </el-form-item>
@@ -116,23 +117,16 @@ import {
   notEmpty,
   phoneNumberValidator,
   emailValidator,
-  minLength,
-  requireCharacter,
   checkPasswordValidator,
-  confirmCodeValidator,
-  maxLength,
-  requireDigit,
+  verifyCodeValidator,
+  loginPasswordValidator,
 } from "../assets/js/validators";
-import SendVerifyCodeComp from '@c/SendVerifyCodeComp'
 
 export default {
   name: "register",
-  components: {
-    SendVerifyCodeComp
-  },
   data () {
     return {
-      registerType: 'phone',
+      registerType: 'mobile',
       formData: {
         countryId: '',
         areaCode: '',
@@ -146,7 +140,7 @@ export default {
       },
       areaCodes: [],
       loading: {
-        register: false,
+        submit: false,
       }
     }
   },
@@ -163,20 +157,17 @@ export default {
           notEmpty('邮箱'),
           emailValidator()
         ],
-        phoneNumber: this.registerType === 'phone' && [
+        phoneNumber: this.registerType === 'mobile' && [
           notEmpty('手机号'),
           phoneNumberValidator(),
         ],
         verifyCode: [
           notEmpty('验证码'),
-          confirmCodeValidator()
+          verifyCodeValidator()
         ],
         password: [
           notEmpty('账户密码'),
-          minLength(8),
-          maxLength(20),
-          requireCharacter(),
-          requireDigit()
+          loginPasswordValidator(),
         ],
         checkPassword: [
           checkPasswordValidator(this.formData.password)
@@ -187,7 +178,7 @@ export default {
     },
     disableSendVerifyCode () {
       switch (this.registerType) {
-        case 'phone':
+        case 'mobile':
           return !this.formData.areaCode || !phoneNumberValidator().pattern.test(this.formData.phoneNumber)
         case 'email':
           return !emailValidator().pattern.test(this.formData.email)

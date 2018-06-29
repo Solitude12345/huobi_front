@@ -1,6 +1,10 @@
 <template>
   <div class="banners-comp">
-    <el-carousel trigger="click" height="560px">
+    <el-carousel
+      arrow="never"
+      :interval="4000"
+      trigger="click"
+      height="560px">
       <el-carousel-item v-for="(banner, idx) in banners" :key="idx">
         <div class="banner-wrap pointer"
              @click="bannerClick(banner)"
@@ -17,28 +21,30 @@ export default {
     return {
       banners: [
         {
-          bannerUrl: '/static/img/Home/huobi_banner_1.png',
+          bannerUrl: '/static/img/Home/leax/banner1.jpg',
           isLocalLink: false,
-          linkUrl: 'https://www.huobipool.com/#!/comment-detail/msw3h8?source=proBanner'
+          linkUrl: ''
         },
         {
-          bannerUrl: '/static/img/Home/huobi_banner_2.jpg',
+          bannerUrl: '/static/img/Home/leax/banner2.jpg',
           isLocalLink: false,
-          linkUrl: '/Account/RefererLink'
+          linkUrl: ''
         },
         {
-          bannerUrl: '/static/img/Home/huobi_banner_3.jpg',
+          bannerUrl: '/static/img/Home/leax/banner3.jpg',
           isLocalLink: false,
-          linkUrl: '/Account/RefererLink'
+          linkUrl: ''
         }
       ]
     }
   },
   methods: {
     bannerClick (banner) {
-      banner.isLocalLink
-        ? this.$router.push(banner.linkUrl)
-        : window.open(banner.linkUrl)
+      if (banner.linkUrl) {
+        banner.isLocalLink
+          ? this.$router.push(banner.linkUrl)
+          : window.open(banner.linkUrl)
+      }
     }
   }
 }

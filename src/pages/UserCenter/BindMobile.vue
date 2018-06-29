@@ -1,12 +1,13 @@
 <template>
-  <div id="modify-password">
+  <div>
     <div class="cont-box">
-      <div class="cont-title">绑定手机</div>
+      <div class="cont-title">{{$store.state.user.mobile && '修改'}}绑定手机</div>
       <div>
         <div class="mh-auto w40 pv-50">
-          <el-form :model="formData">
+          <el-form :model="formData" :rules="rules">
             <el-form-item
-                          label="手机号码">
+              prop="mobile"
+              label="手机号码">
               <el-input v-model.trim="formData.mobile">
                 <template slot="prepend">
                   <el-select v-model="formData.areaCode" placeholder="地区号">
@@ -20,27 +21,29 @@
                 </template>
               </el-input>
             </el-form-item>
-            <el-form-item label="短信验证码">
+            <el-form-item
+              prop="verifyCode"
+              label="短信验证码">
               <div>
                 <br>
                 <el-input
                   v-model="formData.verifyCode"
                   placeholder="30分钟内输入有效"
                   class="w65"></el-input>
-                <el-button
-                  type="text"
+                <send-verify-code-comp
+                  ref="verify"
+                  type="bindMobile"
                   class="ml-20"
-                  v-if="!(readingTime>0)"
-                  :loading="loading.sendingVerify"
-                  @click="sendVerification">发送验证码
-                </el-button>
-                <span v-else style="margin-left: 20px;">{{`${readingTime}s后重新获取`}}</span>
+                  @click="sendVerification"
+                  :disabled="disableSendVerify"
+                  :areaCode="formData.areaCode"
+                  :mobile="formData.mobile" />
               </div>
             </el-form-item>
             <el-form-item class="mt-25 pt-25">
               <el-button type="primary w100 font-16"
                          :loading="loading.submit"
-                         :disabled="!formData.areaCode || !formData.mobile || !formData.verifyCode"
+                         :disabled="disableSubmit"
                          @click="submit">绑定</el-button>
             </el-form-item>
           </el-form>
@@ -51,6 +54,11 @@
 </template>
 
 <script>
+import {
+  phoneNumberValidator,
+  verifyCodeValidator,
+  notEmpty
+} from '@a/js/validators'
 export default {
   name: "BindMobile",
   data () {
@@ -61,48 +69,51 @@ export default {
         mobile: '',
         verifyCode: ''
       },
-      readingTime: 0,
-      ticker: null,
       loading: {
-        sendingVerify: false,
         submit: false
+      },
+      rules: {
+        mobile: [
+          notEmpty('手机号'),
+          phoneNumberValidator()
+        ],
+        verifyCode: [
+          notEmpty('验证码'),
+          verifyCodeValidator()
+        ]
       }
+    }
+  },
+  computed: {
+    disableSendVerify () {
+      return !this.formData.areaCode ||
+        !phoneNumberValidator().pattern.test(this.formData.mobile)
+    },
+    disableSubmit () {
+      return !this.formData.areaCode ||
+        !phoneNumberValidator().pattern.test(this.formData.mobile) ||
+        !verifyCodeValidator().pattern.test(this.formData.verifyCode)
     }
   },
   watch: {
   },
   methods: {
-    async sendVerification () {
-      let {areaCode, mobile} = this.formData
-      if (!areaCode || !mobile) return this.$showErrMsg('请选择地区并输入手机号')
-      else if (!/^\d{8,16}$/.test(mobile)) return this.$showErrMsg('手机号有误')
-      this.loading.sendingVerify = true
-      let res = await this.$fetch('/v1/sendsms/bindMobile', {areaCode, mobile})
-        .finally(() => {
-          this.loading.sendingVerify = false
-        })
-      if (res._statusOk) {
-        this.$showErrMsg('验证码已发送，请注意查收')
-        // 读秒2分钟重新获取验证码
-        this.readingTime = 120
-        this.ticker = setInterval(() => {
-          if (--this.readingTime <= 0) {
-            clearInterval(this.ticker)
-          }
-        }, 1000)
-      }
+    sendVerification () {
+      this.$refs.verify.send()
     },
     async submit () {
+      let {value: password} = await this.$loginPassword(`您正在${this.$store.state.user.mobile ? '修改绑定' : '绑定'}手机号,`)
       this.loading.submit = true
       let {
         areaCode,
         mobile,
-        verifyCode: smsCode
+        verifyCode
       } = this.formData
       let res = await this.$fetch('/v1/user/bindPhone', {
         areaCode,
         mobile,
-        smsCode
+        smsCode: verifyCode,
+        password
       })
         .finally(() => {
           this.loading.submit = false

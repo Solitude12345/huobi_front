@@ -1,5 +1,5 @@
 <template>
-  <div id="page-user-center" class="page-container">
+  <div class="page-container">
     <div class="cont-box page-title">
       {{$route.name}}
     </div>
@@ -20,12 +20,3 @@ export default {
   }
 }
 </script>
-
-<style>
-  #page-user-center .cont-title{
-    font-size: 16px;
-    line-height: 48px;
-    padding: 0 30px;
-    margin: 0 -30px;
-  }
-</style>

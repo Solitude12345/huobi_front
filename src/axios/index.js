@@ -53,6 +53,7 @@ let inValidLogin = function () {
   // router.push('/Login')
   localStorage.setItem('loginBack', router.currentRoute.name)
   location.href = '/#/Login'
+  location.reload()
 }
 
 let $fetch = axiosInstance.$fetch = async function $fetch (...args) {

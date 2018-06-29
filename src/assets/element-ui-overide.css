@@ -112,3 +112,6 @@
 .el-message-box__title{
   color: #e5e5e5;
 }
+.el-button--text.is-loading:before{
+  background-color: transparent;
+}

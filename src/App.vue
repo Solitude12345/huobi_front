@@ -46,7 +46,7 @@ export default {
       return this.$store.state.errMsg
     },
     authorized () {
-      return this.$store.state.user.authorized
+      return this.$store.getters['user/authorized']
     }
   },
   methods: {
@@ -78,7 +78,7 @@ export default {
     position: absolute;
     z-index: 5;
     top: 0;
-    background-color: rgba(0, 0, 0, .1) !important;
+    background-color: rgba(0, 0, 0, .2) !important;
   }
   #err-tip{
     min-width: 300px;

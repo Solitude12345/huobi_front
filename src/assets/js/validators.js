@@ -22,7 +22,7 @@ const notEmpty = function (label) {
 
 const emailValidator = function () {
   return {
-    pattern: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+    pattern: /^[A-Za-z0-9\u4e00-\u9fa5_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
     message: '邮箱格式不正确',
   }
 }
@@ -77,10 +77,24 @@ const phoneNumberValidator = function () {
   }
 }
 
-const confirmCodeValidator = function () {
+const verifyCodeValidator = function () {
   return {
     pattern: /^\d{4}$/,
     message: '验证码为4位数字'
+  }
+}
+
+const loginPasswordValidator = function () {
+  return {
+    pattern: /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,20}$/,
+    message: '账户密码8~20位, 必须包含字母, 数字'
+  }
+}
+
+const tradePasswordValidator = function () {
+  return {
+    pattern: /^\d{6}$/,
+    message: '资金密码为6位数字'
   }
 }
 
@@ -97,5 +111,7 @@ export {
   isImg,
   isSizeFit,
   phoneNumberValidator,
-  confirmCodeValidator,
+  verifyCodeValidator,
+  loginPasswordValidator,
+  tradePasswordValidator,
 }

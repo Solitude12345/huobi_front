@@ -1,5 +1,5 @@
 <template>
-  <div id="modify-password">
+  <div>
     <div class="cont-box">
       <div class="cont-title">修改登录密码</div>
       <div>
@@ -20,7 +20,7 @@
             <el-form-item class="mt-25 pt-25">
               <el-button type="primary w100 font-16"
                          :loading="loading.submit"
-                         :disabled="!formData.oldPassword || !formData.newPassword || !formData.checkPassword"
+                         :disabled="disableSubmit"
                          @click="submit">修改</el-button>
             </el-form-item>
           </el-form>
@@ -33,11 +33,8 @@
 <script>
 import {
   notEmpty,
-  minLength,
-  requireCharacter,
-  maxLength,
+  loginPasswordValidator,
   checkPasswordValidator,
-  requireDigit,
 } from "@a/js/validators";
 
 export default {
@@ -55,6 +52,16 @@ export default {
     }
   },
   computed: {
+    disableSubmit () {
+      let {
+        oldPassword,
+        newPassword,
+        checkPassword
+      } = this.formData
+      return !oldPassword ||
+        !loginPasswordValidator().pattern.test(newPassword) ||
+        checkPassword !== newPassword
+    },
     rules () {
       return {
         oldPassword: [
@@ -62,10 +69,7 @@ export default {
         ],
         newPassword: [
           notEmpty('新密码'),
-          minLength(8),
-          maxLength(20),
-          requireCharacter(),
-          requireDigit()
+          loginPasswordValidator()
         ],
         checkPassword: [
           checkPasswordValidator(this.formData.newPassword)
@@ -94,6 +98,7 @@ export default {
             this.$store.dispatch('user/logout', false)
             localStorage.setItem('loginBack', 'UserInfo')
             location.href = '/#/Login'
+            location.reload()
           })
       }
     }

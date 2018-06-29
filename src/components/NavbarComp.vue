@@ -6,7 +6,11 @@
           <router-link tag="li"
                        :to="{name: 'Home'}"
                        class="nav-item link">
-            <!--<img src="/static/img/laex-logo.png" alt="" height="30">-->
+            <img src="/static/img/laex-logo.png" alt="" height="30">
+          </router-link>
+          <router-link tag="li"
+                       :to="{name: 'Home'}"
+                       class="nav-item link">
             首页
           </router-link>
           <router-link tag="li"
