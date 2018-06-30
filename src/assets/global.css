@@ -217,6 +217,7 @@ table{
 .color-primary,
 .link:hover,
 .link.is-active,
+.router-match.router-link-active,
 .router-link-exact-active
 {
   color: #7a98f7;

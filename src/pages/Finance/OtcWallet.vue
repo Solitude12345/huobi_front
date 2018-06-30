@@ -11,14 +11,13 @@
       </tr>
       </thead>
       <tbody>
-      <template v-for="oCoin in walletData.legal">
+      <template v-for="oCoin in legalBalance.legal">
         <tr :key="oCoin.coin"
             :class="{'is-active': oCoin.coin===currentCoin}">
           <td>{{oCoin.coin | upperCase}}</td>
           <td>{{oCoin.free | sliceTo(8)}}</td>
           <td>{{oCoin.freeze | sliceTo(8)}}</td>
-          <td>
-          </td>
+          <td></td>
           <td class="operation">
             <a @click="showTrans(oCoin.coin, 'distribution')">
               <img src="/static/img/icon/arrow-swap.png" height="20" alt="">
@@ -34,8 +33,7 @@
                 <div class="ml-10p relative w45" style="height: 46px">
                     <span class="wallet-tag tag-ctc"
                           :style="{left:isTransToOtc?'0px':'250px'}">
-                       <!--{{isTransToOtc ? '币币账户' : '法币账户'}}-->
-                      币币账户
+                        币币账户
                     </span>
                   <img src="/static/img/icon/swap.png"
                        height="25"
@@ -44,22 +42,30 @@
                        class="img-swap center-absolute">
                   <span class="wallet-tag tag-otc"
                         :style="{left:!isTransToOtc?'0px':'250px'}">
-                      <!--{{isTransToOtc ? '法币账户' : '币币账户'}}-->
                     法币账户
                     </span>
                 </div>
                 <div class="clear-fix distribution-inputer">
                   <div class="fl w10">划转数量</div>
                   <div class="fr w90">
-                    <el-input class="w50"></el-input>
+                    <el-form :model="formData" :rules="rules">
+                      <el-form-item prop="amount">
+                        <el-input class="w50" v-model="formData.amount"></el-input>
+                      </el-form-item>
+                    </el-form>
                     <div>
                       可转数量：<span class="color-normal">{{transableNum | sliceTo(8)}}</span>
-                      <a class="ml-15">全部划转</a>
+                      <a
+                        class="ml-15"
+                        @click="formData.amount = transableNum">全部划转</a>
                     </div>
                   </div>
                 </div>
                 <div class="ml-10p">
                   <el-button type="primary"
+                             @click="submit"
+                             :disabled="disableSubmit"
+                             :loading="loading.submit"
                              class="font-16 w20">划转
                   </el-button>
                 </div>
@@ -75,39 +81,85 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapActions} from 'vuex'
 
 export default {
   name: "OtcWallet",
   data () {
     return {
-      currentCoin: 'USDT',
-      transDirection: '', // in | out
-      walletData: {},
-      isTransToOtc: true
+      currentCoin: '',
+      transDirection: '',
+      isTransToOtc: true,
+      formData: {
+        amount: '',
+      },
+      loading: {
+        submit: false
+      }
     }
   },
   computed: {
+    disableSubmit () {
+      return !(this.formData.amount > 0)
+    },
+    rules () {
+      return {
+        amount: [
+          {
+            validator: (rule, value, cb) => {
+              if (!value) return true
+              else if (!(Number(value) > 0)) cb('请输入合法数值')
+              else if (+value > this.transableNum) cb('超出可转数量')
+            }
+          }
+        ]
+      }
+    },
+    transFee () {
+      return 0
+    },
     transableNum () {
       let transFrom = this.isTransToOtc
         ? 'coin'
         : 'legal'
-      return this.walletData[transFrom].find(oCoin => oCoin.coin === this.currentCoin).free
+      return this.legalBalance[transFrom].find(oCoin => oCoin.coin === this.currentCoin).free
     },
     ...mapState('user', [
-      'balance'
+      'legalBalance'
     ])
   },
-  watch: {},
+  watch: {
+    isTransToOtc () {
+      this.formData.amount = ''
+    }
+  },
   methods: {
     showTrans (coin, direction) {
       this.transDirection = direction
       this.currentCoin = coin
-    }
+      this.isTransToOtc = true
+      this.formData.amount = ''
+    },
+    async submit () {
+      this.loading.submit = true
+      let res = await this.$fetch(`/v1/account/transfer/${this.currentCoin}`, {
+        amount: this.formData.amount,
+        direction: this.isTransToOtc ? 'c_u' : 'u_c'
+      })
+        .finally(() => {
+          this.loading.submit = false
+        })
+      if (res._statusOk) {
+        this.formData.amount = ''
+        this.getLegalBalance()
+      }
+    },
+    ...mapActions('user', [
+      'getLegalBalance'
+    ])
   },
   async created () {
-    let res = await this.$fetch('/v1/account/legal')
-    if (res._statusOk) this.walletData = res.data
+    this.getLegalBalance()
   }
 }
 </script>

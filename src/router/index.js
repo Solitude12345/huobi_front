@@ -45,6 +45,10 @@ export default new Router({
     },
     {
       path: '/Trade',
+      redirect: '/Trade/USDT'
+    },
+    {
+      path: '/Trade/:coin',
       name: 'Trade',
       component: Trade
     },

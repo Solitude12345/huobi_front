@@ -14,8 +14,8 @@
             首页
           </router-link>
           <router-link tag="li"
-                       :to="{name: 'Trade'}"
-                       class="nav-item link">
+                       to="/Trade"
+                       class="nav-item link router-match">
             法币交易
           </router-link>
           <router-link tag="li"

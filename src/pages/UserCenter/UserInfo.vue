@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="page-user-info">
     <div class="cont-box">
       <div class="cont-title">基本信息</div>
       <div>
@@ -41,50 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="cont-box">
-      <div class="cont-title">
-        收付款方式
-        <a class="font-14 ph-10 fr">添加收付方式</a>
-      </div>
-      <div>
-        <div class="item">
-          <div class="item-label">
-            <img src="/static/img/icon/bankcard.png" class="mr-5" alt="">
-            银行卡
-          </div>
-          <div class="item-info">asdfasdf</div>
-          <div class="item-right">
-            <el-switch :value="true" class="mr-10"></el-switch>
-            <a>修改</a>
-            <a>删除</a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-label">
-            <img src="/static/img/icon/alipay.png" class="mr-5" alt="">
-            支付宝
-          </div>
-          <div class="item-info">asdfasdf</div>
-          <div class="item-right">
-            <el-switch :value="true" class="mr-10"></el-switch>
-            <a>修改</a>
-            <a>删除</a>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-label">
-            <img src="/static/img/icon/wechat.png" class="mr-5" alt="">
-            微信
-          </div>
-          <div class="item-info">asdfasdf</div>
-          <div class="item-right">
-            <el-switch :value="true" class="mr-10"></el-switch>
-            <a>修改</a>
-            <a>删除</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <payment-methods-comp />
     <div class="cont-box">
       <div class="cont-title">双重身份认证</div>
       <div>
@@ -167,8 +124,13 @@
 
 <script>
 import {mapState} from 'vuex'
+import PaymentMethodsComp from '@c/UserCenter/PaymentMethodsComp'
+
 export default {
   name: "user-info",
+  components: {
+    PaymentMethodsComp
+  },
   data () {
     return {}
   },
@@ -212,43 +174,45 @@ export default {
 }
 </script>
 
-<style scoped>
-  .item{
+<style>
+  #page-user-info .item{
     line-height: 48px;
     border-bottom: 1px solid #1f2943;
   }
-.item-label,.item-info,.item-tip{
+  #page-user-info .item-label,
+  #page-user-info .item-info,
+  #page-user-info .item-tip{
   display: inline-block;
 }
-.item-label{
+  #page-user-info .item-label{
   width: 15%;
 }
-.item-info{
+  #page-user-info .item-info{
   width: 25%;
 }
-.log-table{
+  #page-user-info .log-table{
   line-height: 40px;
 }
-.log-tbody td{
+  #page-user-info .log-tbody td{
   border-bottom: 1px solid #1f2943;
 }
-.item-tip{
+  #page-user-info .item-tip{
   width: 40%;
   color: #61688a;
 }
-  .item-right{
+  #page-user-info .item-right{
     float: right;
   }
-  .item-right a{
+  #page-user-info .item-right a{
     padding: 0 10px;
   }
-  .bar-bg{
+  #page-user-info .bar-bg{
     display: inline-block;
     height: 12px;
     width: 50%;
     background-color: #1e2235;
   }
-  .bar-percent{
+  #page-user-info .bar-percent{
     height: 12px;
     background-color: #7a98f7;
   }

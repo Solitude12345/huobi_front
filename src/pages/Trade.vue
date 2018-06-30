@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
 import CoinListComp from '@c/Trade/CoinListComp'
 import TradeUserInfoComp from '@c/Trade/TradeUserInfoComp'
 import EntrustListComp from '@c/Trade/EntrustListComp'
@@ -27,22 +28,14 @@ export default {
     UserTradeOrdersComp
   },
   data () {
-    return {
-      coins: [
-        'USDT',
-        'BTC',
-        'ETH',
-        'ETC',
-        'LTC',
-        'EOS',
-        'BCH',
-        'QTUM',
-        'NEO',
-        'XUC',
-      ]
-    }
+    return {}
   },
-  computed: {},
+  computed: {
+    ...mapState('user', [
+      'authorized',
+      'legalBalance'
+    ])
+  },
   watch: {},
   methods: {}
 }

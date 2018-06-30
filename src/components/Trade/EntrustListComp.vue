@@ -158,11 +158,6 @@ export default {
 </script>
 
 <style scoped>
-/*th{*/
-  /*font-weight: normal;*/
-  /*color: gray;*/
-  /*text-align: right;*/
-/*}*/
 .entrust-list-comp{
   font-size: 13px;
 }

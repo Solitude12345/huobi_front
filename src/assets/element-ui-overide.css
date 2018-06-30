@@ -115,3 +115,10 @@
 .el-button--text.is-loading:before{
   background-color: transparent;
 }
+
+.v-modal{
+  opacity: .3;
+}
+.el-dialog{
+  background-color: #262a42;
+}

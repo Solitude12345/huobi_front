@@ -9,7 +9,11 @@ export default {
     balance: {},
     email: null,
     mobile: null,
-    hasTradePassword: false
+    hasTradePassword: false,
+    legalBalance: {
+      legal: [],
+      coin: []
+    }
   },
   getters: {
     authorized (state) {
@@ -34,6 +38,9 @@ export default {
     },
     updateUserInfo (state, data) {
       Object.assign(state, data)
+    },
+    updateLegalBalance (state, data) {
+      state.legalBalance = data
     }
   },
   actions: {
@@ -60,6 +67,10 @@ export default {
     async getUserInfo ({commit}) {
       let res = await $fetch('/v1/user/userinfo')
       res._statusOk && commit('updateUserInfo', res.data)
+    },
+    async getLegalBalance ({commit}) {
+      let res = await $fetch('/v1/account/legal')
+      if (res._statusOk) commit('updateLegalBalance', res.data)
     }
   }
 }
